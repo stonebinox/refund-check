@@ -51,10 +51,10 @@ export const useData = () => {
     } else if (dayOfWeek === "Sunday") {
       return utcEquivalent
         .add(1, "days") // move it to monday
-        .hour(9) // 9 A.hour(startHourOfDay) // 9 AM UTC
+        .hour(startHourOfDay)
         .minute(0)
         .second(0)
-        .tz(mappedTimezone) // convert it back to PST
+        .tz(mappedTimezone) // convert it back to original timezone
         .unix();
     } else {
       if (isBeforeEndOfDay && isAfterStartOfDay) {
@@ -82,7 +82,7 @@ export const useData = () => {
         .hour(startHourOfDay) // 9 AM UTC
         .minute(0)
         .second(0)
-        .tz(mappedTimezone) // convert it back to PST
+        .tz(mappedTimezone) // convert it back to original timezone
         .unix();
     }
   };

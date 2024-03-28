@@ -31,7 +31,7 @@ export const RequestRow: React.FC<RequestProps> = ({ request }) => {
       <div>{name}</div>
       <div>{timezone.toUpperCase()}</div>
       <div>{signupTime.format("DD MMM YYYY")}</div>
-      <div>{investmentTime.format("DD MMM YYYY HH:mm:ss")}</div>
+      <div>{investmentTime.format("dddd, DD MMM YYYY HH:mm:ss")}</div>
       <div>{refundTime.format("dddd, DD MMM YYYY HH:mm:ss")}</div>
       <div>{registeredTime.format("dddd, DD MMM YYYY HH:mm:ss")}</div>
       <div>{requestSource}</div>

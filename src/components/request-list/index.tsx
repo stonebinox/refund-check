@@ -7,7 +7,6 @@ import { Request } from "./request-row";
 export const RequestList = () => {
   const requests = useData();
 
-  console.log(requests);
   return (
     <div className="request-list">
       <div className="request-row">

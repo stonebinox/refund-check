@@ -100,7 +100,7 @@ export const useData = () => {
     let approved = false;
 
     if (signupTs > tosChange) {
-      let limit = newWebTosLimit; // default to web limit
+      let limit = newWebTosLimit; // defaults to web limit
 
       if (requestSource === "phone") {
         limit = newPhoneTosLimit;
@@ -115,7 +115,7 @@ export const useData = () => {
         approved = true;
       }
     } else {
-      let limit = oldWebTosLimit; // default to web limit
+      let limit = oldWebTosLimit; // defaults to web limit
 
       if (requestSource === "phone") {
         limit = oldPhoneTsLimit;

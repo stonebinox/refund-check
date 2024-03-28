@@ -2,10 +2,11 @@ import React from "react";
 
 import "./request-list.css";
 import { useData } from "../../hooks/use-data/use-data";
-import { Request } from "./request-row";
+import { RequestRow } from "./request-row";
+import { ProcessedRequestSchema } from "../../types/ProcessedRequestSchema";
 
-export const RequestList = () => {
-  const requests = useData();
+export const RequestList: React.FC = () => {
+  const requests: ProcessedRequestSchema[] = useData();
 
   return (
     <div className="request-list">
@@ -36,7 +37,7 @@ export const RequestList = () => {
         </div>
       </div>
       {requests.map((request, i) => (
-        <Request key={i} request={request} />
+        <RequestRow key={i} request={request} />
       ))}
     </div>
   );

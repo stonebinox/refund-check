@@ -1,12 +1,13 @@
 import React from "react";
-import { ProcessedRequestSchema } from "../../../types/ProcessedRequestSchema";
 import moment from "moment-timezone";
+
+import { ProcessedRequestSchema } from "../../../types/ProcessedRequestSchema";
 
 interface RequestProps {
   request: ProcessedRequestSchema;
 }
 
-export const Request: React.FC<RequestProps> = ({ request }) => {
+export const RequestRow: React.FC<RequestProps> = ({ request }) => {
   const {
     name,
     approved,

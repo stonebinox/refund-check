@@ -4,19 +4,16 @@ import { ProcessedRequestSchema } from "../../types/ProcessedRequestSchema";
 import { data } from "../../data/store";
 import { RefundRequestSchema } from "../../types/RefundRequestSchema";
 import moment from "moment-timezone";
-import { TimezoneMap } from "../../types/TimezoneMap";
-
-const tosChange = 1577919600;
-const newPhoneTosLimit = 86400;
-const oldPhoneTsLimit = 14400;
-const newWebTosLimit = 57600;
-const oldWebTosLimit = 28800;
-const timezoneMap: TimezoneMap[] = [
-  { timezone: "utc", fullName: "Europe/London" },
-  { timezone: "pst", fullName: "America/Los_Angeles" },
-  { timezone: "est", fullName: "America/New_York" },
-  { timezone: "cet", fullName: "Europe/Paris" },
-];
+import {
+  endHourOfDay,
+  newPhoneTosLimit,
+  newWebTosLimit,
+  oldPhoneTsLimit,
+  oldWebTosLimit,
+  startHourOfDay,
+  timezoneMap,
+  tosChange,
+} from "../../globals";
 
 export const useData = () => {
   const [processedRequests, setProcessedRequests] = useState<
@@ -30,57 +27,61 @@ export const useData = () => {
     const originTs = moment.tz(ts * 1000, mappedTimezone);
     const utcEquivalent = originTs.utc();
     const dayOfWeek = utcEquivalent.format("dddd");
+    const endOfDay = utcEquivalent
+      .clone()
+      .hour(endHourOfDay)
+      .minute(0)
+      .second(0);
+    const startOfDay = utcEquivalent
+      .clone()
+      .hour(startHourOfDay)
+      .minute(0)
+      .second(0);
+    const isBeforeEndOfDay = utcEquivalent.isBefore(endOfDay);
+    const isAfterStartOfDay = utcEquivalent.isAfter(startOfDay);
 
     if (dayOfWeek === "Saturday") {
       return utcEquivalent
         .add(2, "days") // move it to monday
-        .hour(9) // 9 AM UTC
+        .hour(startHourOfDay) // 9 AM UTC
+        .minute(0)
+        .second(0)
         .tz(mappedTimezone) // convert it back to PST
         .unix();
     } else if (dayOfWeek === "Sunday") {
       return utcEquivalent
         .add(1, "days") // move it to monday
-        .hour(9) // 9 AM UTC
-        .tz(mappedTimezone) // convert it back to PST
-        .unix();
-    } else if (dayOfWeek === "Friday") {
-      const eod = utcEquivalent.clone().hour(17).minute(0).second(0);
-      const sod = utcEquivalent.clone().hour(9).minute(0).second(0); // Start Of Day
-      const isBeforeEod = utcEquivalent.isBefore(eod);
-      const isAfterSod = utcEquivalent.isAfter(sod);
-
-      if (isBeforeEod && isAfterSod) {
-        return ts;
-      }
-
-      if (!isAfterSod) {
-        // if early in the day before 9 AM
-        return utcEquivalent.clone().hour(9).minute(0).second(0).unix();
-      }
-
-      return utcEquivalent
-        .add(3, "days") // move it to monday
-        .hour(9) // 9 AM UTC
+        .hour(9) // 9 A.hour(startHourOfDay) // 9 AM UTC
+        .minute(0)
+        .second(0)
         .tz(mappedTimezone) // convert it back to PST
         .unix();
     } else {
-      const eod = utcEquivalent.clone().hour(17).minute(0).second(0);
-      const sod = utcEquivalent.clone().hour(9).minute(0).second(0); // Start Of Day
-      const isBeforeEod = utcEquivalent.isBefore(eod);
-      const isAfterSod = utcEquivalent.isAfter(sod);
-
-      if (isBeforeEod && isAfterSod) {
+      if (isBeforeEndOfDay && isAfterStartOfDay) {
         return ts;
       }
 
-      if (!isAfterSod) {
+      if (!isAfterStartOfDay) {
         // if early in the day before 9 AM
-        return utcEquivalent.clone().hour(9).minute(0).second(0).unix();
+        return utcEquivalent
+          .clone()
+          .hour(startHourOfDay)
+          .minute(0)
+          .second(0)
+          .unix();
+      }
+
+      let skipDayCount = 1;
+
+      if (dayOfWeek === "Friday") {
+        skipDayCount = 3;
       }
 
       return utcEquivalent
-        .add(1, "days") // move it to next day
-        .hour(9) // 9 AM UTC
+        .add(skipDayCount, "days") // move it to next day
+        .hour(startHourOfDay) // 9 AM UTC
+        .minute(0)
+        .second(0)
         .tz(mappedTimezone) // convert it back to PST
         .unix();
     }
